@@ -5,7 +5,7 @@ Dice.__index = Dice
 --# Interface
 
 function Dice.fromString(diceString)
-    local quantity, size = diceString:match'(%d+)d(%d+)'
+    local quantity, size = diceString:match'^(%d+)d(%d+)$'
 
     if quantity ~= nil and size ~= nil then
         return Dice.new(tonumber(quantity, 10), tonumber(size, 10))
@@ -43,6 +43,7 @@ if ... == nil then
         '1d3',
         '2d6',
         '2d3',
+        '1d6+1',
     } do
         if i ~= 1 then
             print()
