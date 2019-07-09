@@ -4,6 +4,16 @@ Dice.__index = Dice
 
 --# Interface
 
+--[[
+    Get a dice distribution from a dice string, which is in the form of a list
+    of terms separated by + and -. Each term is either:
+
+    - a dice roll expression of the form XdY, where X and Y are integers;
+    - or a constant integer X, which is interpreted as Xd1.
+
+    The terms are added and subtracted, as specified by + and - respectively,
+    to form a compound dice distribution.
+--]]
 function Dice.fromString(diceString)
     local diceTable = {}
 
@@ -40,6 +50,7 @@ function Dice.new(diceTable)
     return setmetatable({diceTable = diceTable}, Dice)
 end
 
+-- Get the minimum possible value of the distribution.
 function Dice:minimum()
     local sum = 0
 
@@ -50,6 +61,10 @@ function Dice:minimum()
     return sum
 end
 
+--[[
+    Get the mean value of the distribution, defined as the mean of all the
+    possible values the distribution can take on weighted by their probability.
+--]]
 function Dice:mean()
     local sum = 0
 
@@ -60,6 +75,7 @@ function Dice:mean()
     return sum
 end
 
+-- Get the maximum possible value of the distribution.
 function Dice:maximum()
     local sum = 0
 
