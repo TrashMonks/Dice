@@ -13,6 +13,10 @@ Dice.__index = Dice
 
     The terms are added and subtracted, as specified by + and - respectively,
     to form a compound dice distribution.
+
+    For example, Dice.fromString'5d3+1d2-1' gets the distribution that's
+    represented by rolling 5 3-sided dice, rolling a 2-sided die, and
+    subtracting 1 from their sum.
 --]]
 function Dice.fromString(diceString)
     local diceTable = {}
