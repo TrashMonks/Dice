@@ -8,7 +8,7 @@ function Dice.fromString(diceString)
     local diceTable = {}
 
     for term in diceString:gmatch'[+-]?[^+-]+' do
-        local quantity, size = term:match'^(%d+)d(%d+)$'
+        local quantity, size = term:match'^([+-]?%d+)d(%d+)$'
 
         if quantity ~= nil and size ~= nil then
             diceTable[#diceTable + 1] = {
