@@ -5,32 +5,60 @@ Dice.__index = Dice
 --# Interface
 
 function Dice.fromString(diceString)
-    local quantity, size = diceString:match'^(%d+)d(%d+)$'
+    local diceTable = {}
 
-    if quantity ~= nil and size ~= nil then
-        return Dice.new(tonumber(quantity, 10), tonumber(size, 10))
-    else
-        error'UNIMPLEMENTED: Dice.fromString'
+    for term in diceString:gmatch'[+-]?[^+-]+' do
+        local quantity, size = term:match'^(%d+)d(%d+)$'
+
+        if quantity ~= nil and size ~= nil then
+            diceTable[#diceTable + 1] = {
+                quantity = tonumber(quantity, 10),
+                size = tonumber(size, 10),
+            }
+        else
+            error([[
+
+I couldn't make sense of this as a dice string: ]] .. diceString .. [[
+
+In particular, this part doesn't look like a term I understand: ]] .. term)
+        end
     end
+
+    return Dice.new(diceTable)
 end
 
-function Dice.new(quantity, size)
-    return setmetatable({
-        quantity = quantity,
-        size = size,
-    }, Dice)
+function Dice.new(diceTable)
+    return setmetatable({diceTable = diceTable}, Dice)
 end
 
 function Dice:minimum()
-    return self.quantity * 1
+    local sum = 0
+
+    for _, subdice in ipairs(self.diceTable) do
+        sum = sum + subdice.quantity * 1
+    end
+
+    return sum
 end
 
 function Dice:mean()
-    return self.quantity * (1 + self.size) / 2
+    local sum = 0
+
+    for _, subdice in ipairs(self.diceTable) do
+        sum = sum + subdice.quantity * (1 + subdice.size) / 2
+    end
+
+    return sum
 end
 
 function Dice:maximum()
-    return self.quantity * self.size
+    local sum = 0
+
+    for _, subdice in ipairs(self.diceTable) do
+        sum = sum + subdice.quantity * subdice.size
+    end
+
+    return sum
 end
 
 --# Main
