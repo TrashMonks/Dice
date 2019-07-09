@@ -43,10 +43,6 @@ In particular, this part doesn't look like a term I understand: ]] .. term)
         end
     end
 
-    return Dice.new(diceTable)
-end
-
-function Dice.new(diceTable)
     return setmetatable({diceTable = diceTable}, Dice)
 end
 
@@ -55,7 +51,11 @@ function Dice:minimum()
     local sum = 0
 
     for _, subdice in ipairs(self.diceTable) do
-        sum = sum + subdice.quantity * 1
+        if subdice.quantity >= 0 then
+            sum = sum + subdice.quantity * 1
+        else
+            sum = sum + subdice.quantity * subdice.size
+        end
     end
 
     return sum
@@ -80,7 +80,11 @@ function Dice:maximum()
     local sum = 0
 
     for _, subdice in ipairs(self.diceTable) do
-        sum = sum + subdice.quantity * subdice.size
+        if subdice.quantity >= 0 then
+            sum = sum + subdice.quantity * subdice.size
+        else
+            sum = sum + subdice.quantity * 1
+        end
     end
 
     return sum
@@ -103,6 +107,7 @@ if ... == nil then
         '7-7-7',
         '0',
         '-1',
+        '1d6-1d6',
     } do
         if i ~= 1 then
             print()
