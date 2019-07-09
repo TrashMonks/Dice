@@ -16,11 +16,20 @@ function Dice.fromString(diceString)
                 size = tonumber(size, 10),
             }
         else
-            error([[
+            local quantity = term:match'^([+-]?%d+)$'
+
+            if quantity ~= nil then
+                diceTable[#diceTable + 1] = {
+                    quantity = tonumber(quantity, 10),
+                    size = 1,
+                }
+            else
+                error([[
 
 I couldn't make sense of this as a dice string: ]] .. diceString .. [[
 
 In particular, this part doesn't look like a term I understand: ]] .. term)
+            end
         end
     end
 
