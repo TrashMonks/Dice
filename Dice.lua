@@ -1,4 +1,3 @@
-#!/usr/bin/env lua
 local Dice = {}
 Dice.__index = Dice
 
@@ -92,37 +91,6 @@ function Dice:maximum()
     end
 
     return sum
-end
-
---# Main
-
--- If this module is run without arguments, run some sample cases.
-if ... == nil then
-    for i, diceString in ipairs{
-        '1d6',
-        '1d4',
-        '1d3',
-        '2d6',
-        '2d3',
-        '1d6+1',
-        '1d6-1d4',
-        '5d3+1d2-1',
-        '1d10-1d7+8',
-        '7-7-7',
-        '0',
-        '-1',
-        '1d6-1d6',
-    } do
-        if i ~= 1 then
-            print()
-        end
-
-        local dice = Dice.fromString(diceString)
-        print('distribution:', diceString)
-        print('minimum:', dice:minimum())
-        print('mean:', dice:mean())
-        print('maximum:', dice:maximum())
-    end
 end
 
 --# Export
