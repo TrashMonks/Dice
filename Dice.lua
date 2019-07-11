@@ -1,3 +1,10 @@
+--[[
+    Dice.lua
+
+    The core repository for this Lua module can be found at:
+    https://bitbucket.org/HeladoDeBrownie/dice/
+
+--]]
 local Dice = {}
 Dice.__index = Dice
 
