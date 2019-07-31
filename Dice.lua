@@ -79,16 +79,22 @@ Dice.fromString = Dice.fromDiceString
 --]]
 function Dice.fromRangeString(rangeString)
     local minimum, maximum = rangeString:gsub('%s', ''):match'^(%d+)-(%d+)$'
-    return newDice{
-        {
-            quantity = 1,
-            size = maximum - minimum + 1,
-        },
-        {
-            quantity = minimum - 1,
-            size = 1,
-        },
-    }
+
+    if minimum ~= nil and maximum ~= nil then
+        return newDice{
+            {
+                quantity = 1,
+                size = maximum - minimum + 1,
+            },
+            {
+                quantity = minimum - 1,
+                size = 1,
+            },
+        }
+    else
+        error("I couldn't make sense of this as a range string: "
+            .. rangeString)
+    end
 end
 
 -- Get the minimum possible value of the distribution.
