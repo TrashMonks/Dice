@@ -85,12 +85,12 @@ rolls.
 
 For example:
 
-- `Dice.fromDiceString'1d6':mean() gives `3.5`, because all the possible rolls
+- `Dice.fromDiceString'1d6':mean()` gives `3.5`, because all the possible rolls
 are 1, 2, 3, 4, 5, and 6, whose sum is 21, which is then divided by 6, which is
 the number of distinct rolls. 21 divided by 6 is 3.5.
-- `Dice.fromDiceString'3d4':mean() gives `7.5`, which is the mean of 1d4,
+- `Dice.fromDiceString'3d4':mean()` gives `7.5`, which is the mean of 1d4,
 multiplied by 3.
-- `Dice.fromDiceString'3d4-1d3':mean() gives `5.5`, which is the difference of
+- `Dice.fromDiceString'3d4-1d3':mean()` gives `5.5`, which is the difference of
 the mean of the individual rolls 3d4 and 1d3.
 
 ### `diceRoll:maximum()`
