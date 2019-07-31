@@ -8,6 +8,12 @@
 local Dice = {}
 Dice.__index = Dice
 
+--# Private
+
+local function newDice(diceTable)
+    return setmetatable({diceTable = diceTable}, Dice)
+end
+
 --# Interface
 
 --[[
@@ -20,11 +26,11 @@ Dice.__index = Dice
     The terms are added and subtracted, as specified by + and - respectively,
     to form a compound dice distribution.
 
-    For example, Dice.fromString'5d3+1d2-1' gets the distribution that's
+    For example, Dice.fromDiceString'5d3+1d2-1' gets the distribution that's
     represented by rolling 5 3-sided dice, rolling a 2-sided die, and
     subtracting 1 from their sum.
 --]]
-function Dice.fromString(diceString)
+function Dice.fromDiceString(diceString)
     local diceTable = {}
 
     for term in diceString:gsub('%s', ''):gmatch'[+-]?[^+-]+' do
@@ -53,7 +59,36 @@ In particular, this part doesn't look like a term I understand: ]] .. term)
         end
     end
 
-    return setmetatable({diceTable = diceTable}, Dice)
+    return newDice(diceTable)
+end
+
+-- Dice.fromString is an alias for Dice.fromDiceString.
+Dice.fromString = Dice.fromDiceString
+
+--[[
+    Get a dice distribution from a range string, which is of the form X-Y,
+    where X and Y are nonnegative integers.
+
+    This has the limitation that it doesn't accept negative numbers. To specify
+    a distribution involving negative numbers, use the more general
+    Dice.fromDiceString instead.
+
+    For example, Dice.fromRangeString'4-8' gets the distribution that gives
+    integers 4 through 8 with equal probability, equivalent to the distribution
+    given by the dice string '1d5+3'.
+--]]
+function Dice.fromRangeString(rangeString)
+    local minimum, maximum = rangeString:gsub('%s', ''):match'^(%d+)-(%d+)$'
+    return newDice{
+        {
+            quantity = 1,
+            size = maximum - minimum + 1,
+        },
+        {
+            quantity = minimum - 1,
+            size = 1,
+        },
+    }
 end
 
 -- Get the minimum possible value of the distribution.
