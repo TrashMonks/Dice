@@ -1,7 +1,7 @@
 --[[
     Dice.lua
 
-    The core repository for this Lua module can be found at:
+    The core repository and documentation for this Lua module can be found at:
     https://bitbucket.org/HeladoDeBrownie/dice/
 
 --]]
@@ -16,20 +16,6 @@ end
 
 --# Interface
 
---[[
-    Get a dice distribution from a dice string, which is in the form of a list
-    of terms separated by + and -. Each term is either:
-
-    - a dice roll expression of the form XdY, where X and Y are integers;
-    - or a constant integer X, which is interpreted as Xd1.
-
-    The terms are added and subtracted, as specified by + and - respectively,
-    to form a compound dice distribution.
-
-    For example, Dice.fromDiceString'5d3+1d2-1' gets the distribution that's
-    represented by rolling 5 3-sided dice, rolling a 2-sided die, and
-    subtracting 1 from their sum.
---]]
 function Dice.fromDiceString(diceString)
     local diceTable = {}
 
@@ -62,21 +48,8 @@ In particular, this part doesn't look like a term I understand: ]] .. term)
     return newDice(diceTable)
 end
 
--- Dice.fromString is an alias for Dice.fromDiceString.
 Dice.fromString = Dice.fromDiceString
 
---[[
-    Get a dice distribution from a range string, which is of the form X-Y,
-    where X and Y are nonnegative integers.
-
-    This has the limitation that it doesn't accept negative numbers. To specify
-    a distribution involving negative numbers, use the more general
-    Dice.fromDiceString instead.
-
-    For example, Dice.fromRangeString'4-8' gets the distribution that gives
-    integers 4 through 8 with equal probability, equivalent to the distribution
-    given by the dice string '1d5+3'.
---]]
 function Dice.fromRangeString(rangeString)
     local minimum, maximum = rangeString:gsub('%s', ''):match'^(%d+)-(%d+)$'
 
@@ -97,7 +70,6 @@ function Dice.fromRangeString(rangeString)
     end
 end
 
--- Get the minimum possible value of the distribution.
 function Dice:minimum()
     local sum = 0
 
@@ -112,10 +84,6 @@ function Dice:minimum()
     return sum
 end
 
---[[
-    Get the mean value of the distribution, defined as the mean of all the
-    possible values the distribution can take on weighted by their probability.
---]]
 function Dice:mean()
     local sum = 0
 
@@ -126,7 +94,6 @@ function Dice:mean()
     return sum
 end
 
--- Get the maximum possible value of the distribution.
 function Dice:maximum()
     local sum = 0
 
