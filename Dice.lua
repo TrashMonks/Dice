@@ -27,7 +27,7 @@ Dice.__index = Dice
 function Dice.fromString(diceString)
     local diceTable = {}
 
-    for term in diceString:gmatch'[+-]?[^+-]+' do
+    for term in diceString:gsub('%s', ''):gmatch'[+-]?[^+-]+' do
         local quantity, size = term:match'^([+-]?%d+)d(%d+)$'
 
         if quantity ~= nil and size ~= nil then

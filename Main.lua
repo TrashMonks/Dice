@@ -15,6 +15,8 @@ local sampleDiceStrings = {
     '0',
     '-1',
     '1d6-1d6',
+    '2 + 3d2 + 2d6',
+    '2+3d2+2d6',
 }
 
 local function main()
