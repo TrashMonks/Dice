@@ -27,7 +27,7 @@ separated by `+` or `-`, where each term is either:
 `36`, or `123`), representing a fixed amount;
 - or a dice term comprising two constants as just described, separated by `d`
 as in the common tabletop roleplaying convention (such as `1d6`, `2d4`, or
-`36d15`), representing the rolling of a certain quantity (the first constant)\
+`36d15`), representing the rolling of a certain quantity (the first constant)
 of dice of a certain number of sides (the second constant).
 
 (Whitespace is completely ignored and thus may appear *anywhere* in the string.)
