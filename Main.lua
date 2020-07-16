@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
 local Dice = require'Dice'
 
-local sampleDiceStrings = {
+local example_dice_strings = {
     '1d6',
     '1d4',
     '1d3',
@@ -21,14 +21,14 @@ local sampleDiceStrings = {
     '0d11',
 }
 
-local sampleRangeStrings = {
+local example_range_strings = {
     '1-6',
     '1-4',
     '1-3',
     '4-8',
 }
 
-local function printDistribution(string, dice)
+local function print_distribution(string, dice)
         print('distribution:', string)
         print('minimum:', dice:minimum())
         print('average:', dice:average())
@@ -38,24 +38,24 @@ end
 local function main()
     print'FROM DICE STRINGS\n'
 
-    for i, diceString in ipairs(sampleDiceStrings) do
+    for i, dice_string in ipairs(example_dice_strings) do
         if i ~= 1 then
             print()
         end
 
-        local dice = Dice.fromDiceString(diceString)
-        printDistribution(diceString, dice)
+        local dice = Dice.from_dice_string(dice_string)
+        print_distribution(dice_string, dice)
     end
 
     print'\nFROM RANGE STRINGS\n'
 
-    for i, rangeString in ipairs(sampleRangeStrings) do
+    for i, range_string in ipairs(example_range_strings) do
         if i ~= 1 then
             print()
         end
 
-        local dice = Dice.fromRangeString(rangeString)
-        printDistribution(rangeString, dice)
+        local dice = Dice.from_range_string(range_string)
+        print_distribution(range_string, dice)
     end
 end
 

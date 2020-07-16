@@ -17,16 +17,16 @@ local CONSTANT_PATTERN = '^([+-]?%d+)$'
 
 local RANGE_PATTERN = '^(%d+)-(%d+)$'
 
-local function newDice(diceList)
+local function new_dice(dice_list)
     local result = {}
-    private[result] = {diceList = diceList}
+    private[result] = {dice_list = dice_list}
     return setmetatable(result, dice_metatable)
 end
 
-local function mapSumDice(dice, mapper)
+local function map_sum_dice(dice, mapper)
     local sum = 0
 
-    for _, subdice in ipairs(private[dice].diceList) do
+    for _, subdice in ipairs(private[dice].dice_list) do
         sum = sum + mapper(subdice.quantity, subdice.size)
     end
 
@@ -35,14 +35,14 @@ end
 
 --# Exports
 
-function Dice.fromDiceString(diceString)
-    local diceList = {}
+function Dice.from_dice_string(dice_string)
+    local dice_list = {}
 
-    for term in diceString:gsub('%s', ''):gmatch(DICE_TERM_PATTERN) do
+    for term in dice_string:gsub('%s', ''):gmatch(DICE_TERM_PATTERN) do
         local quantity, size = term:match(XDY_PATTERN)
 
         if quantity ~= nil and size ~= nil then
-            diceList[#diceList + 1] = {
+            dice_list[#dice_list + 1] = {
                 quantity = tonumber(quantity, 10),
                 size = tonumber(size, 10),
             }
@@ -50,26 +50,26 @@ function Dice.fromDiceString(diceString)
             local quantity = term:match(CONSTANT_PATTERN)
 
             if quantity ~= nil then
-                diceList[#diceList + 1] = {
+                dice_list[#dice_list + 1] = {
                     quantity = tonumber(quantity, 10),
                     size = 1,
                 }
             else
-                error(DICE_STRING_PARSE_ERROR_FORMAT:format(diceString, term))
+                error(DICE_STRING_PARSE_ERROR_FORMAT:format(dice_string, term))
             end
         end
     end
 
-    return newDice(diceList)
+    return new_dice(dice_list)
 end
 
-Dice.fromString = Dice.fromDiceString
+Dice.from_string = Dice.from_dice_string
 
-function Dice.fromRangeString(rangeString)
-    local minimum, maximum = rangeString:gsub('%s', ''):match(RANGE_PATTERN)
+function Dice.from_range_string(range_string)
+    local minimum, maximum = range_string:gsub('%s', ''):match(RANGE_PATTERN)
 
     if minimum ~= nil and maximum ~= nil then
-        return newDice{
+        return new_dice{
             {
                 quantity = 1,
                 size = maximum - minimum + 1,
@@ -80,12 +80,12 @@ function Dice.fromRangeString(rangeString)
             },
         }
     else
-        error(RANGE_STRING_PARSE_ERROR_FORMAT:format(rangeString, term))
+        error(RANGE_STRING_PARSE_ERROR_FORMAT:format(range_string, term))
     end
 end
 
 function Dice:minimum()
-    return mapSumDice(self, function (quantity, size)
+    return map_sum_dice(self, function (quantity, size)
         return math.min(quantity * 1, quantity * size)
     end)
 end
@@ -93,17 +93,17 @@ end
 Dice.min = Dice.minimum
 
 function Dice:average()
-    return mapSumDice(self, function (quantity, size)
+    return map_sum_dice(self, function (quantity, size)
         return quantity * ((1 + size) / 2)
     end)
 end
 
 Dice.ev = Dice.average
-Dice.expectedValue = Dice.average
+Dice.expected_value = Dice.average
 Dice.mean = Dice.average
 
 function Dice:maximum()
-    return mapSumDice(self, function (quantity, size)
+    return map_sum_dice(self, function (quantity, size)
         return math.max(quantity * 1, quantity * size)
     end)
 end

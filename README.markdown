@@ -10,15 +10,15 @@ environment):
 
 ## Parsing a roll from a string
 
-### `Dice.fromDiceString`
+### `Dice.from_dice_string`
 
-(Also called `Dice.fromString`.)
+(Also called `Dice.from_string`.)
 
-`Dice.fromDiceString` is the more general of the parsing functions and can be
+`Dice.from_dice_string` is the more general of the parsing functions and can be
 used to return any roll resulting from addition and subtraction of rolls of
 conventional polyhedral dice and constants.
 
-    local diceRoll = Dice.fromDiceString(diceString)
+    local dice_roll = Dice.from_dice_string(dice_string)
 
 Get a dice roll based on the given dice string, which is a list of terms
 separated by `+` or `-`, where each term is either:
@@ -34,19 +34,19 @@ of dice of a certain number of sides (the second constant).
 
 Example valid dice strings include `0`, `1d6`, `2d4 + 1`, `1d2-1`, and `6 -1d4`.
 
-### `Dice.fromRangeString`
+### `Dice.from_range_string`
 
-`Dice.fromRangeString` is more specialized than `Dice.fromDiceString` but uses
-a more conventional syntax for a specific type of random choice.
+`Dice.from_range_string` is more specialized than `Dice.from_dice_string` but
+uses a more conventional syntax for a specific type of random choice.
 
-    local diceRoll = Dice.fromRangeString(rangeString)
+    local dice_roll = Dice.from_range_string(range_string)
 
 Get a dice roll based on the given range string, which is two constant terms
-(as in `Dice.fromDiceString`) separated by `-`, representing a roll with equal
-possibility of giving any of the integers starting at one limit and ending at
-the other. (Note: Both constants must be non-negative.)
+(as in `Dice.from_dice_string`) separated by `-`, representing a roll with
+equal possibility of giving any of the integers starting at one limit and
+ending at the other. (Note: Both constants must be non-negative.)
 
-(Whitespace is ignored the same as with `Dice.fromDiceString`.)
+(Whitespace is ignored the same as with `Dice.from_dice_string`.)
 
 Example valid range strings include `1-6`, `4 - 8`, `2-2`, `0-0`.
 
@@ -58,7 +58,7 @@ represent a minus sign in the other parser's syntax.)
 Once you have a roll value given by one of the aforementioned functions, you
 can call one of the following methods on it to compute a specific statistic:
 
-### `diceRoll:minimum()`
+### `dice_roll:minimum()`
 
 Compute the minimum possible value that can be rolled.
 
@@ -67,15 +67,15 @@ value; all that are *subtracted* from the total take on their *greatest* value.
 
 For example:
 
-- `Dice.fromDiceString'1d6':minimum()` gives `1`, the least number that can be
-rolled on a polyhedral die.
-- `Dice.fromDiceString'3d4':minimum()` gives `3`, because each of three dice is
-rolling a 1.
-- `Dice.fromDiceString'3d4-1d3':minimum()` gives `0`, because each of the three
-positive dice roll a 1 and the one negative die rolls its maximum value, a 3,
-which cancels the 3 contributed by the positive dice.
+- `Dice.from_dice_string'1d6':minimum()` gives `1`, the least number that can
+be rolled on a polyhedral die.
+- `Dice.from_dice_string'3d4':minimum()` gives `3`, because each of three dice
+is rolling a 1.
+- `Dice.from_dice_string'3d4-1d3':minimum()` gives `0`, because each of the
+three positive dice roll a 1 and the one negative die rolls its maximum value,
+a 3, which cancels the 3 contributed by the positive dice.
 
-### `diceRoll:mean()`
+### `dice_roll:mean()`
 
 Compute the mean value of all possible rolls.
 
@@ -85,15 +85,15 @@ rolls.
 
 For example:
 
-- `Dice.fromDiceString'1d6':mean()` gives `3.5`, because all the possible rolls
-are 1, 2, 3, 4, 5, and 6, whose sum is 21, which is then divided by 6, which is
-the number of distinct rolls. 21 divided by 6 is 3.5.
-- `Dice.fromDiceString'3d4':mean()` gives `7.5`, which is the mean of 1d4,
+- `Dice.from_dice_string'1d6':mean()` gives `3.5`, because all the possible
+rolls are 1, 2, 3, 4, 5, and 6, whose sum is 21, which is then divided by 6,
+which is the number of distinct rolls. 21 divided by 6 is 3.5.
+- `Dice.from_dice_string'3d4':mean()` gives `7.5`, which is the mean of 1d4,
 multiplied by 3.
-- `Dice.fromDiceString'3d4-1d3':mean()` gives `5.5`, which is the difference of
-the mean of the individual rolls 3d4 and 1d3.
+- `Dice.from_dice_string'3d4-1d3':mean()` gives `5.5`, which is the difference
+of the mean of the individual rolls 3d4 and 1d3.
 
-### `diceRoll:maximum()`
+### `dice_roll:maximum()`
 
 Compute the maximum possible value that can be rolled.
 
@@ -102,11 +102,11 @@ value; all that are *subtracted* from the total take on their *least* value.
 
 For example:
 
-- `Dice.fromDiceString'1d6':maximum()` gives `6`, the greatest number that can
-be rolled on a six-sided die.
-- `Dice.fromDiceString'3d4':maximum()` gives `12`, because each of three dice
+- `Dice.from_dice_string'1d6':maximum()` gives `6`, the greatest number that
+can be rolled on a six-sided die.
+- `Dice.from_dice_string'3d4':maximum()` gives `12`, because each of three dice
 is rolling a 4.
-- `Dice.fromDiceString'3d4-1d3':maximum()` gives `11`, because each of the
+- `Dice.from_dice_string'3d4-1d3':maximum()` gives `11`, because each of the
 three positive dice roll a 4, and the one negative die rolls a 1, giving three
 times four minus one.
 
