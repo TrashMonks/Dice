@@ -78,11 +78,8 @@ function Dice:minimum()
     local sum = 0
 
     for _, subdice in ipairs(private[self].diceList) do
-        if subdice.quantity >= 0 then
-            sum = sum + subdice.quantity * 1
-        else
-            sum = sum + subdice.quantity * subdice.size
-        end
+        sum = sum +
+            math.min(subdice.quantity * 1, subdice.quantity * subdice.size)
     end
 
     return sum
@@ -102,11 +99,8 @@ function Dice:maximum()
     local sum = 0
 
     for _, subdice in ipairs(private[self].diceList) do
-        if subdice.quantity >= 0 then
-            sum = sum + subdice.quantity * subdice.size
-        else
-            sum = sum + subdice.quantity * 1
-        end
+        sum = sum +
+            math.max(subdice.quantity * 1, subdice.quantity * subdice.size)
     end
 
     return sum
