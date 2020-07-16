@@ -74,13 +74,13 @@ Compute which of two dice rolls is “better” using the following metrics, in 
 
 If all of these are equal, the two distributions are the same.
 
-The result will two values. The first of which is a number, which is:
+The result is two values. The first is a number, which is:
 
 - -1 if the second argument is better;
 - 0 if neither is better;
 - or 1 if the first argument is better.
 
-The second is a value describing which metric was used to determine the result.
+The second is a string describing which metric was used to determine the result.
 
 For example:
 
