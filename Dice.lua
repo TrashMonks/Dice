@@ -42,18 +42,18 @@ function Dice.from_dice_string(dice_string)
         local quantity, size = term:match(XDY_PATTERN)
 
         if quantity ~= nil and size ~= nil then
-            dice_list[#dice_list + 1] = {
+            table.insert(dice_list, {
                 quantity = tonumber(quantity, 10),
                 size = tonumber(size, 10),
-            }
+            })
         else
             local quantity = term:match(CONSTANT_PATTERN)
 
             if quantity ~= nil then
-                dice_list[#dice_list + 1] = {
+                table.insert(dice_list, {
                     quantity = tonumber(quantity, 10),
                     size = 1,
-                }
+                })
             else
                 error(DICE_STRING_PARSE_ERROR_FORMAT:format(dice_string, term))
             end
