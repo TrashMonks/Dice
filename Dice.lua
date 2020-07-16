@@ -114,6 +114,8 @@ function Dice.compare(dice_a, dice_b)
     end
 end
 
+Dice.compare = dice_method(Dice.compare)
+
 --## Parsing a roll from a string
 
 --### Dice.from_dice_string
