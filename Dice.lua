@@ -1,50 +1,59 @@
 local Dice = {}
-Dice.__index = Dice
+local dice_metatable = {__index = Dice}
 
---# Private
+local DICE_STRING_PARSE_ERROR_FORMAT = [[
 
-local function newDice(diceTable)
-    return setmetatable({diceTable = diceTable}, Dice)
+I couldn't make sense of this as a dice string: %s
+In particular, this part doesn't look like a term I understand: %s]]
+
+local RANGE_STRING_PARSE_ERROR_FORMAT = [[
+
+I couldn't make sense of this as a range string: %s]]
+
+local DICE_TERM_PATTERN = '[+-]?[^+-]+'
+local XDY_PATTERN = '^([+-]?%d+)d(%d+)$'
+local CONSTANT_PATTERN = '^([+-]?%d+)$'
+
+local RANGE_PATTERN = '^(%d+)-(%d+)$'
+
+local function newDice(diceList)
+    return setmetatable({diceList = diceList}, dice_metatable)
 end
 
---# Interface
+--# Exports
 
 function Dice.fromDiceString(diceString)
-    local diceTable = {}
+    local diceList = {}
 
-    for term in diceString:gsub('%s', ''):gmatch'[+-]?[^+-]+' do
-        local quantity, size = term:match'^([+-]?%d+)d(%d+)$'
+    for term in diceString:gsub('%s', ''):gmatch(DICE_TERM_PATTERN) do
+        local quantity, size = term:match(XDY_PATTERN)
 
         if quantity ~= nil and size ~= nil then
-            diceTable[#diceTable + 1] = {
+            diceList[#diceList + 1] = {
                 quantity = tonumber(quantity, 10),
                 size = tonumber(size, 10),
             }
         else
-            local quantity = term:match'^([+-]?%d+)$'
+            local quantity = term:match(CONSTANT_PATTERN)
 
             if quantity ~= nil then
-                diceTable[#diceTable + 1] = {
+                diceList[#diceList + 1] = {
                     quantity = tonumber(quantity, 10),
                     size = 1,
                 }
             else
-                error([[
-
-I couldn't make sense of this as a dice string: ]] .. diceString .. [[
-
-In particular, this part doesn't look like a term I understand: ]] .. term)
+                error(DICE_STRING_PARSE_ERROR_FORMAT:format(diceString, term))
             end
         end
     end
 
-    return newDice(diceTable)
+    return newDice(diceList)
 end
 
 Dice.fromString = Dice.fromDiceString
 
 function Dice.fromRangeString(rangeString)
-    local minimum, maximum = rangeString:gsub('%s', ''):match'^(%d+)-(%d+)$'
+    local minimum, maximum = rangeString:gsub('%s', ''):match(RANGE_PATTERN)
 
     if minimum ~= nil and maximum ~= nil then
         return newDice{
@@ -58,15 +67,14 @@ function Dice.fromRangeString(rangeString)
             },
         }
     else
-        error("I couldn't make sense of this as a range string: "
-            .. rangeString)
+        error(RANGE_STRING_PARSE_ERROR_FORMAT:format(rangeString, term))
     end
 end
 
 function Dice:minimum()
     local sum = 0
 
-    for _, subdice in ipairs(self.diceTable) do
+    for _, subdice in ipairs(self.diceList) do
         if subdice.quantity >= 0 then
             sum = sum + subdice.quantity * 1
         else
@@ -80,7 +88,7 @@ end
 function Dice:mean()
     local sum = 0
 
-    for _, subdice in ipairs(self.diceTable) do
+    for _, subdice in ipairs(self.diceList) do
         sum = sum + subdice.quantity * (1 + subdice.size) / 2
     end
 
@@ -90,7 +98,7 @@ end
 function Dice:maximum()
     local sum = 0
 
-    for _, subdice in ipairs(self.diceTable) do
+    for _, subdice in ipairs(self.diceList) do
         if subdice.quantity >= 0 then
             sum = sum + subdice.quantity * subdice.size
         else
@@ -100,7 +108,5 @@ function Dice:maximum()
 
     return sum
 end
-
---# Export
 
 return Dice
