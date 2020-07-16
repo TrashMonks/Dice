@@ -1,5 +1,5 @@
-This library is for computing basic dice roll statistics: their minimum, mean,
-and maximum values.
+This library is for computing basic dice roll statistics: their minimum,
+average, and maximum values.
 
 # Documentation
 
@@ -60,6 +60,8 @@ can call one of the following methods on it to compute a specific statistic:
 
 ### `dice_roll:minimum()`
 
+(Also called `dice_roll:min()`.)
+
 Compute the minimum possible value that can be rolled.
 
 That is, all dice whose values are added to the total take on their least
@@ -75,9 +77,12 @@ is rolling a 1.
 three positive dice roll a 1 and the one negative die rolls its maximum value,
 a 3, which cancels the 3 contributed by the positive dice.
 
-### `dice_roll:mean()`
+### `dice_roll:average()`
 
-Compute the mean value of all possible rolls.
+(Also called `dice_roll:ev()`, `dice_roll:expected_value()`, and
+`dice_roll:mean()`.)
+
+Compute the average value of all possible rolls.
 
 Conceptually, this is the sum of all the possible rolls that can be made,
 weighted by how likely they are, divided by the total weight of all possible
@@ -85,13 +90,13 @@ rolls.
 
 For example:
 
-- `Dice.from_dice_string'1d6':mean()` gives `3.5`, because all the possible
+- `Dice.from_dice_string'1d6':average()` gives `3.5`, because all the possible
 rolls are 1, 2, 3, 4, 5, and 6, whose sum is 21, which is then divided by 6,
 which is the number of distinct rolls. 21 divided by 6 is 3.5.
-- `Dice.from_dice_string'3d4':mean()` gives `7.5`, which is the mean of 1d4,
-multiplied by 3.
-- `Dice.from_dice_string'3d4-1d3':mean()` gives `5.5`, which is the difference
-of the mean of the individual rolls 3d4 and 1d3.
+- `Dice.from_dice_string'3d4':average()` gives `7.5`, which is the average of
+1d4, multiplied by 3.
+- `Dice.from_dice_string'3d4-1d3':average()` gives `5.5`, which is the
+difference of the average of the individual rolls 3d4 and 1d3.
 
 ### `dice_roll:maximum()`
 
