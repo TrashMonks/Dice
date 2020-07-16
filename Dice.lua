@@ -108,6 +108,10 @@ function Dice:maximum()
     end)
 end
 
+function Dice:range()
+    return math.abs(self:maximum() - self:minimum() + 1)
+end
+
 Dice.max = Dice.maximum
 
 return Dice

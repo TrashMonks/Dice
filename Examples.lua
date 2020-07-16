@@ -33,6 +33,7 @@ local function print_distribution(string, dice)
         print('minimum:', dice:minimum())
         print('average:', dice:average())
         print('maximum:', dice:maximum())
+        print('range:', dice:range())
 end
 
 local function main()

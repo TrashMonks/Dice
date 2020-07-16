@@ -115,6 +115,22 @@ is rolling a 4.
 three positive dice roll a 4, and the one negative die rolls a 1, giving three
 times four minus one.
 
+### `dice_roll:range()`
+
+Compute the number of possible distinct values the dice roll can take on.
+
+This is the same as subtracting its minimum from its maximum and adding one.
+
+For example:
+
+- `Dice.from_dice_string'1d6':range()` gives `6`, because there are 6 possible
+values on a six-sided die.
+- `Dice.from_dice_string'3d4':range()` gives `10`, because even though some
+of the possible totals of the three dice are more likely than others, there
+are still only 10 distinct ones.
+- `Dice.from_dice_string'3d4-1d3':range()` gives `12`, because subtracting 1d3
+gives two more possibilities (not three!).
+
 # Examples
 
 See [`Main.lua`](Main.lua) for a complete example of a program that uses this
