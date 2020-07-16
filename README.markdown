@@ -64,6 +64,30 @@ For example:
 - `Dice.range'3d4'` gives `10`, because even though some of the possible totals of the three dice are more likely than others, there are still only 10 distinct ones.
 - `Dice.range'3d4-1d3'` gives `12`, because subtracting 1d3 gives two more possibilities (not three!).
 
+### `Dice.compare`
+
+Compute which of two dice rolls is “better” using the following metrics, in order of applicability:
+
+- greater average
+- smaller range
+- less variance (TODO: not yet implemented)
+
+If all of these are equal, the two distributions are the same.
+
+The result will two values. The first of which is a number, which is:
+
+- -1 if the second argument is better;
+- 0 if neither is better;
+- or 1 if the first argument is better.
+
+The second is a value describing which metric was used to determine the result.
+
+For example:
+
+- `Dice.compare('1d6', '1d4')` returns `1, 'greater average'` because the average of 1d6 is greater than that of 1d4.
+- `Dice.compare('1d5', '1d3+1')` returns `-1, 'smaller range'` because the averages are the same and the range of 1d3+1 is smaller than that of 1d5.
+- `Dice.compare('1d3', '4-1d3')` returns `0, 'inconclusive'` because both rolls represent the same probability distribution.
+
 ## Parsing a roll from a string
 
 ### `Dice.from_dice_string`

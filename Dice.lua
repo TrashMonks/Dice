@@ -91,6 +91,29 @@ end
 
 Dice.range = dice_method(Dice.range)
 
+--### Dice.compare
+
+function Dice.compare(dice_a, dice_b)
+    local average_a, average_b = Dice.average(dice_a), Dice.average(dice_b)
+
+    if average_a > average_b then
+        return 1, 'greater average'
+    elseif average_b > average_a then
+        return -1, 'greater average'
+    else
+        local range_a, range_b = Dice.range(dice_a), Dice.range(dice_b)
+
+        if range_a < range_b then
+            return 1, 'smaller range'
+        elseif range_b < range_a then
+            return -1, 'smaller range'
+        else
+            -- TODO: Compare some measure of variance.
+            return 0, 'inconclusive'
+        end
+    end
+end
+
 --## Parsing a roll from a string
 
 --### Dice.from_dice_string
