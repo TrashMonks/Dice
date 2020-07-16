@@ -1,5 +1,6 @@
 local Dice = {}
 local dice_metatable = {__index = Dice}
+local private = setmetatable({}, {__mode = 'k'})
 
 local DICE_STRING_PARSE_ERROR_FORMAT = [[
 
@@ -17,7 +18,9 @@ local CONSTANT_PATTERN = '^([+-]?%d+)$'
 local RANGE_PATTERN = '^(%d+)-(%d+)$'
 
 local function newDice(diceList)
-    return setmetatable({diceList = diceList}, dice_metatable)
+    local result = {}
+    private[result] = {diceList = diceList}
+    return setmetatable(result, dice_metatable)
 end
 
 --# Exports
@@ -74,7 +77,7 @@ end
 function Dice:minimum()
     local sum = 0
 
-    for _, subdice in ipairs(self.diceList) do
+    for _, subdice in ipairs(private[self].diceList) do
         if subdice.quantity >= 0 then
             sum = sum + subdice.quantity * 1
         else
@@ -88,7 +91,7 @@ end
 function Dice:mean()
     local sum = 0
 
-    for _, subdice in ipairs(self.diceList) do
+    for _, subdice in ipairs(private[self].diceList) do
         sum = sum + subdice.quantity * (1 + subdice.size) / 2
     end
 
@@ -98,7 +101,7 @@ end
 function Dice:maximum()
     local sum = 0
 
-    for _, subdice in ipairs(self.diceList) do
+    for _, subdice in ipairs(private[self].diceList) do
         if subdice.quantity >= 0 then
             sum = sum + subdice.quantity * subdice.size
         else
