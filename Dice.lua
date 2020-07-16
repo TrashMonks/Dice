@@ -23,6 +23,16 @@ local function newDice(diceList)
     return setmetatable(result, dice_metatable)
 end
 
+local function mapSumDice(dice, mapper)
+    local sum = 0
+
+    for _, subdice in ipairs(private[dice].diceList) do
+        sum = sum + mapper(subdice.quantity, subdice.size)
+    end
+
+    return sum
+end
+
 --# Exports
 
 function Dice.fromDiceString(diceString)
@@ -75,35 +85,21 @@ function Dice.fromRangeString(rangeString)
 end
 
 function Dice:minimum()
-    local sum = 0
-
-    for _, subdice in ipairs(private[self].diceList) do
-        sum = sum +
-            math.min(subdice.quantity * 1, subdice.quantity * subdice.size)
-    end
-
-    return sum
+    return mapSumDice(self, function (quantity, size)
+        return math.min(quantity * 1, quantity * size)
+    end)
 end
 
 function Dice:mean()
-    local sum = 0
-
-    for _, subdice in ipairs(private[self].diceList) do
-        sum = sum + subdice.quantity * (1 + subdice.size) / 2
-    end
-
-    return sum
+    return mapSumDice(self, function (quantity, size)
+        return quantity * ((1 + size) / 2)
+    end)
 end
 
 function Dice:maximum()
-    local sum = 0
-
-    for _, subdice in ipairs(private[self].diceList) do
-        sum = sum +
-            math.max(subdice.quantity * 1, subdice.quantity * subdice.size)
-    end
-
-    return sum
+    return mapSumDice(self, function (quantity, size)
+        return math.max(quantity * 1, quantity * size)
+    end)
 end
 
 return Dice
