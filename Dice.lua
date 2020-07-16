@@ -23,6 +23,17 @@ local function new_dice(dice_list)
     return setmetatable(result, dice_metatable)
 end
 
+-- Return a dice-string-compatible version of the given function.
+local function dice_method(method)
+    return function (dice)
+        if type(dice) == 'string' then
+            return method(Dice.from_dice_string(dice))
+        else
+            return method(dice)
+        end
+    end
+end
+
 local function map_sum_dice(dice, mapper)
     local sum = 0
 
@@ -90,6 +101,7 @@ function Dice:minimum()
     end)
 end
 
+Dice.minimum = dice_method(Dice.minimum)
 Dice.min = Dice.minimum
 
 function Dice:average()
@@ -98,6 +110,7 @@ function Dice:average()
     end)
 end
 
+Dice.average = dice_method(Dice.average)
 Dice.ev = Dice.average
 Dice.expected_value = Dice.average
 Dice.mean = Dice.average
@@ -108,10 +121,13 @@ function Dice:maximum()
     end)
 end
 
+Dice.maximum = dice_method(Dice.maximum)
+Dice.max = Dice.maximum
+
 function Dice:range()
     return math.abs(self:maximum() - self:minimum() + 1)
 end
 
-Dice.max = Dice.maximum
+Dice.range = dice_method(Dice.range)
 
 return Dice
