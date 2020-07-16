@@ -46,6 +46,55 @@ end
 
 --# Exports
 
+--## Computing the statistics of a roll
+
+--### Dice.average
+
+function Dice:average()
+    return map_sum_dice(self, function (quantity, size)
+        return quantity * ((1 + size) / 2)
+    end)
+end
+
+Dice.average = dice_method(Dice.average)
+Dice.ev = Dice.average
+Dice.expected_value = Dice.average
+Dice.mean = Dice.average
+
+--### Dice.maximum
+
+function Dice:maximum()
+    return map_sum_dice(self, function (quantity, size)
+        return math.max(quantity * 1, quantity * size)
+    end)
+end
+
+Dice.maximum = dice_method(Dice.maximum)
+Dice.max = Dice.maximum
+
+--### Dice.minimum
+
+function Dice:minimum()
+    return map_sum_dice(self, function (quantity, size)
+        return math.min(quantity * 1, quantity * size)
+    end)
+end
+
+Dice.minimum = dice_method(Dice.minimum)
+Dice.min = Dice.minimum
+
+--### Dice.range
+
+function Dice:range()
+    return math.abs(self:maximum() - self:minimum() + 1)
+end
+
+Dice.range = dice_method(Dice.range)
+
+--## Parsing a roll from a string
+
+--### Dice.from_dice_string
+
 function Dice.from_dice_string(dice_string)
     local dice_list = {}
 
@@ -76,6 +125,8 @@ end
 
 Dice.from_string = Dice.from_dice_string
 
+--### Dice.from_range_string
+
 function Dice.from_range_string(range_string)
     local minimum, maximum = range_string:gsub('%s', ''):match(RANGE_PATTERN)
 
@@ -95,39 +146,6 @@ function Dice.from_range_string(range_string)
     end
 end
 
-function Dice:minimum()
-    return map_sum_dice(self, function (quantity, size)
-        return math.min(quantity * 1, quantity * size)
-    end)
-end
-
-Dice.minimum = dice_method(Dice.minimum)
-Dice.min = Dice.minimum
-
-function Dice:average()
-    return map_sum_dice(self, function (quantity, size)
-        return quantity * ((1 + size) / 2)
-    end)
-end
-
-Dice.average = dice_method(Dice.average)
-Dice.ev = Dice.average
-Dice.expected_value = Dice.average
-Dice.mean = Dice.average
-
-function Dice:maximum()
-    return map_sum_dice(self, function (quantity, size)
-        return math.max(quantity * 1, quantity * size)
-    end)
-end
-
-Dice.maximum = dice_method(Dice.maximum)
-Dice.max = Dice.maximum
-
-function Dice:range()
-    return math.abs(self:maximum() - self:minimum() + 1)
-end
-
-Dice.range = dice_method(Dice.range)
+--##
 
 return Dice

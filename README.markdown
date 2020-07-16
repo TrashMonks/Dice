@@ -10,21 +10,7 @@ The actual import code may vary depending on your Lua environment.
 
 ## Computing the statistics of a roll
 
-The following functions can be called on either a string representing a dice roll, or a dice roll value as given by the functions in the section [Parsing a roll from a string](#Parsing a roll from a string).
-
-### `Dice.minimum`
-
-(Also called `Dice.min`.)
-
-Compute the minimum possible value that can be rolled.
-
-That is, all dice whose values are added to the total take on their least value; all that are *subtracted* from the total take on their *greatest* value.
-
-For example:
-
-- `Dice.minimum'1d6'` gives `1`, the least number that can be rolled on a polyhedral die.
-- `Dice.minimum'3d4'` gives `3`, because each of three dice is rolling a 1.
-- `Dice.minimum'3d4-1d3'` gives `0`, because each of the three positive dice roll a 1 and the one negative die rolls its maximum value, a 3, which cancels the 3 contributed by the positive dice.
+The following functions can be called on either a string representing a dice roll, or a dice roll value as given by the functions in the section [Parsing a roll from a string](#parsing-a-roll-from-a-string).
 
 ### `Dice.average`
 
@@ -51,6 +37,20 @@ For example:
 - `Dice.maximum'1d6'` gives `6`, the greatest number that can be rolled on a six-sided die.
 - `Dice.maximum'3d4'` gives `12`, because each of three dice is rolling a 4.
 - `Dice.maximum'3d4-1d3'` gives `11`, because each of the three positive dice roll a 4, and the one negative die rolls a 1, giving three times four minus one.
+
+### `Dice.minimum`
+
+(Also called `Dice.min`.)
+
+Compute the minimum possible value that can be rolled.
+
+That is, all dice whose values are added to the total take on their least value; all that are *subtracted* from the total take on their *greatest* value.
+
+For example:
+
+- `Dice.minimum'1d6'` gives `1`, the least number that can be rolled on a polyhedral die.
+- `Dice.minimum'3d4'` gives `3`, because each of three dice is rolling a 1.
+- `Dice.minimum'3d4-1d3'` gives `0`, because each of the three positive dice roll a 1 and the one negative die rolls its maximum value, a 3, which cancels the 3 contributed by the positive dice.
 
 ### `Dice.range`
 
@@ -83,7 +83,7 @@ Get a dice roll based on the given dice string, which is a list of terms separat
 
 Example valid dice strings include `0`, `1d6`, `2d4 + 1`, `1d2-1`, and `6 -1d4`.
 
-This function is implicitly called by all functions in the section [Computing the statistics of a roll](#Computing the statistics of a roll) when passed a string. It may still be useful if you wish to call several methods on the same dice roll without implicitly creating multiple copies of the same dice roll value.
+This function is implicitly called by all functions in the section [Computing the statistics of a roll](#computing-the-statistics-of-a-roll) when passed a string. It may still be useful if you wish to call several methods on the same dice roll without implicitly creating multiple copies of the same dice roll value.
 
 ### `Dice.from_range_string`
 
