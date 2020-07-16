@@ -31,7 +31,7 @@ local sampleRangeStrings = {
 local function printDistribution(string, dice)
         print('distribution:', string)
         print('minimum:', dice:minimum())
-        print('mean:', dice:mean())
+        print('average:', dice:average())
         print('maximum:', dice:maximum())
 end
 

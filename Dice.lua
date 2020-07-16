@@ -90,16 +90,24 @@ function Dice:minimum()
     end)
 end
 
-function Dice:mean()
+Dice.min = Dice.minimum
+
+function Dice:average()
     return mapSumDice(self, function (quantity, size)
         return quantity * ((1 + size) / 2)
     end)
 end
+
+Dice.ev = Dice.average
+Dice.expectedValue = Dice.average
+Dice.mean = Dice.average
 
 function Dice:maximum()
     return mapSumDice(self, function (quantity, size)
         return math.max(quantity * 1, quantity * size)
     end)
 end
+
+Dice.max = Dice.maximum
 
 return Dice
