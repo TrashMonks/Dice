@@ -34,6 +34,7 @@ local function print_distribution(string, dice)
         print('average:', dice:average())
         print('maximum:', dice:maximum())
         print('range:', dice:range())
+        print('variance:', dice:variance())
 end
 
 local function main()

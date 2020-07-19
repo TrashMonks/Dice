@@ -91,6 +91,21 @@ end
 
 Dice.range = dice_method(Dice.range)
 
+--### Dice.variance
+
+function Dice:variance()
+    return map_sum_dice(self, function (quantity, size)
+        local single_die_average = (1 + size) / 2
+        local sum = 0
+
+        for n = 1, size do
+            sum = sum + (n - single_die_average) ^ 2 / size
+        end
+
+        return quantity * sum
+    end)
+end
+
 --### Dice.compare
 
 function Dice.compare(dice_a, dice_b)

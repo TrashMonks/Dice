@@ -64,6 +64,12 @@ For example:
 - `Dice.range'3d4'` gives `10`, because even though some of the possible totals of the three dice are more likely than others, there are still only 10 distinct ones.
 - `Dice.range'3d4-1d3'` gives `12`, because subtracting 1d3 gives two more possibilities (not three!).
 
+### `Dice.variance`
+
+Compute the variance of the dice roll's probability distribution. This is the sum of the variances of all the individual dice rolled, where each die's variance is equal to the sum of the squares of each possible result's difference from the die's mean result weighted by how probable they are.
+
+This description may be a mouthful, but variance is a useful measure in statistics and thus is provided both for completeness and for its usefulness in [`Dice.compare`](#dicecompare).
+
 ### `Dice.compare`
 
 Compute which of two dice rolls is “better” using the following metrics, in order of applicability:
