@@ -102,7 +102,7 @@ function Dice:variance()
             sum = sum + (n - single_die_average) ^ 2 / size
         end
 
-        return quantity * sum
+        return math.abs(quantity) * sum
     end)
 end
 
