@@ -95,6 +95,12 @@ For example:
 - `Dice.compare('1d3+1', '2d2')` returns `-1, 'less variance'` because everything is the same except the variance, which is smaller for 2d2.
 - `Dice.compare('1d3', '4-1d3')` returns `0, 'no difference'` because both rolls represent the same probability distribution.
 
+### `Dice.roll`
+
+(Also called `Dice.sample`.)
+
+Roll the dice, producing a single integer as a result. This method uses Lua's `math.random` and thus is affected by `math.randomseed`.
+
 ## Parsing a roll from a string
 
 ### `Dice.from_dice_string`

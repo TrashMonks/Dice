@@ -108,6 +108,27 @@ end
 
 Dice.variance = dice_method(Dice.variance)
 
+--### Dice.roll
+
+function Dice:roll()
+    return map_sum_dice(self, function (quantity, size)
+        local sum = 0
+
+        for n = 1, math.abs(quantity) do
+            sum = sum + math.random(1, size)
+        end
+
+        if quantity >= 0 then
+            return sum
+        else
+            return -sum
+        end
+    end)
+end
+
+Dice.roll = dice_method(Dice.roll)
+Dice.sample = Dice.roll
+
 --### Dice.compare
 
 function Dice.compare(dice_a, dice_b)
