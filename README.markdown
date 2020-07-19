@@ -76,7 +76,7 @@ Compute which of two dice rolls is “better” using the following metrics, in 
 
 - greater average
 - smaller range
-- less variance (TODO: not yet implemented)
+- less variance
 
 If all of these are equal, the two distributions are the same.
 
@@ -86,13 +86,14 @@ The result is two values. The first is a number, which is:
 - 0 if neither is better;
 - or 1 if the first argument is better.
 
-The second is a string describing which metric was used to determine the result.
+The second is a string describing which metric was used to determine the result: either one of the above metrics as a string or `'no difference'`.
 
 For example:
 
 - `Dice.compare('1d6', '1d4')` returns `1, 'greater average'` because the average of 1d6 is greater than that of 1d4.
 - `Dice.compare('1d5', '1d3+1')` returns `-1, 'smaller range'` because the averages are the same and the range of 1d3+1 is smaller than that of 1d5.
-- `Dice.compare('1d3', '4-1d3')` returns `0, 'inconclusive'` because both rolls represent the same probability distribution.
+- `Dice.compare('1d3+1', '2d2')` returns `-1, 'less variance'` because everything is the same except the variance, which is smaller for 2d2.
+- `Dice.compare('1d3', '4-1d3')` returns `0, 'no difference'` because both rolls represent the same probability distribution.
 
 ## Parsing a roll from a string
 

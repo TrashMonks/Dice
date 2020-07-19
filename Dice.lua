@@ -106,6 +106,8 @@ function Dice:variance()
     end)
 end
 
+Dice.variance = dice_method(Dice.variance)
+
 --### Dice.compare
 
 function Dice.compare(dice_a, dice_b)
@@ -123,13 +125,21 @@ function Dice.compare(dice_a, dice_b)
         elseif range_b < range_a then
             return -1, 'smaller range'
         else
-            -- TODO: Compare some measure of variance.
+            local variance_a, variance_b =
+                Dice.variance(dice_a), Dice.variance(dice_b)
+
+            if variance_a < variance_b then
+                return 1, 'less variance'
+            elseif variance_b < variance_a then
+                return -1, 'less variance'
+            else
+                return 0, 'no difference'
+            end
+
             return 0, 'inconclusive'
         end
     end
 end
-
-Dice.compare = dice_method(Dice.compare)
 
 --## Parsing a roll from a string
 
