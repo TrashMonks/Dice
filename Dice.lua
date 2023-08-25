@@ -1,222 +1,316 @@
-local Dice = {}
-local dice_metatable = {__index = Dice}
-local private = setmetatable({}, {__mode = 'k'})
+-- The implementation of this module makes use of a class metaphor. All a class
+-- really is is a table meant to be used as a metatable.
 
-local DICE_STRING_PARSE_ERROR_FORMAT = [[
+-- # Helper Functions
 
-I couldn't make sense of this as a dice string: %s
-In particular, this part doesn't look like a term I understand: %s]]
-
-local RANGE_STRING_PARSE_ERROR_FORMAT = [[
-
-I couldn't make sense of this as a range string: %s]]
-
-local DICE_TERM_PATTERN = '[+-]?[^+-]+'
-local XDY_PATTERN = '^([+-]?%d+)d(%d+)$'
-local CONSTANT_PATTERN = '^([+-]?%d+)$'
-
-local RANGE_PATTERN = '^(%d+)-(%d+)$'
-
-local function new_dice(dice_list)
-    local result = {}
-    private[result] = {dice_list = dice_list}
-    return setmetatable(result, dice_metatable)
+-- Instantiate the given class, passing the given arguments to its 'initialize'
+-- method.
+local function new(class, ...)
+    local result = setmetatable({}, {__index = class})
+    result:initialize(...)
+    return result
 end
 
--- Return a dice-string-compatible version of the given function.
-local function dice_method(method)
-    return function (dice)
-        if type(dice) == 'string' then
-            return method(Dice.from_dice_string(dice))
-        else
-            return method(dice)
-        end
+-- Derive the given class, adding a 'new' method to the child class.
+local function derive(class)
+    return setmetatable({new = new}, {__index = class})
+end
+
+-- Return a function usable as a method that always gives an error.
+local function unimplemented(method_name)
+    assert(type(method_name) == 'string')
+
+    return function ()
+        error('unimplemented: ' .. method_name)
     end
 end
 
-local function map_sum_dice(dice, mapper)
+-- Return a function usable as a method that calls the given method.
+local function alias(method_name)
+    return function (self, ...)
+        return self[method_name](self, ...)
+    end
+end
+
+-- Is the given value an integer?
+local function is_integer(value)
+    return type(value) == 'number' and value == math.floor(value)
+end
+
+-- Is the given value an integer at least a certain amount?
+local function is_integer_at_least(lower_bound, value)
+    return is_integer(value) and value >= lower_bound
+end
+
+-- Is the given value a natural number, i.e., an integer at least 0?
+local function is_natural(value)
+    return is_integer_at_least(0, value)
+end
+
+-- Does the given value represent an expression in the dice DSL?
+-- NOTE: This function exists mostly to mark intent. It doesn't actually check
+-- if the given table has all the methods expected of an expression.
+local function is_expression(value)
+    return type(value) == 'table'
+end
+
+-- Every distribution we care about is symmetric, so its mean is the mean of
+-- its minimum and maximum.
+local function mean(expression)
+    return (expression:maximum() + expression:minimum()) / 2
+end
+
+-- The range of a distribution is the distance between its minimum and maximum.
+local function range(expression)
+    return expression:maximum() - expression:minimum()
+end
+
+-- The standard deviation of a distribution is the square root of its variance.
+local function standard_deviation(expression)
+    return math.sqrt(expression:variance())
+end
+
+-- # Dice Expression DSL
+
+-- ## BaseExpression
+
+local BaseExpression = {
+    -- These definitions don't need to be overridden by derived classes.
+    mean = mean,
+    range = range,
+    standard_deviation = standard_deviation,
+
+    -- Derived classes must provide definitions for these.
+    initialize = unimplemented('initialize'),
+    minimum = unimplemented('minimum'),
+    maximum = unimplemented('maximum'),
+    variance = unimplemented('variance'),
+    roll = unimplemented('roll'),
+
+    -- Methods can be called by various names.
+    average = alias('mean'),
+    ev = alias('mean'),
+    expected_value = alias('mean'),
+    sd = alias('standard_deviation'),
+    min = alias('minimum'),
+    max = alias('maximum'),
+    sample = alias('roll'),
+}
+
+-- ## Constant
+
+local Constant = derive(BaseExpression)
+
+function Constant:initialize(constant)
+    assert(is_integer(constant))
+    self.constant = constant
+end
+
+function Constant:minimum()
+    return self.constant
+end
+
+function Constant:maximum()
+    return self.constant
+end
+
+function Constant:variance()
+    return 0
+end
+
+function Constant:roll()
+    return self.constant
+end
+
+-- ## DiceRoll
+
+local DiceRoll = derive(BaseExpression)
+
+function DiceRoll:initialize(quantity, sides)
+    assert(is_natural(quantity))
+    assert(is_natural(sides) and sides >= 1)
+    self.quantity = quantity
+    self.sides = sides
+end
+
+function DiceRoll:minimum()
+    return math.min(self.quantity * 1, self.quantity * self.sides)
+end
+
+function DiceRoll:maximum()
+    return math.max(self.quantity * 1, self.quantity * self.sides)
+end
+
+function DiceRoll:variance()
+    local single_die_mean = (1 + self.sides) / 2
     local sum = 0
 
-    for _, subdice in ipairs(private[dice].dice_list) do
-        sum = sum + mapper(subdice.quantity, subdice.size)
+    for n = 1, self.sides do
+        sum = sum + (n - single_die_mean) ^ 2
     end
 
-    return sum
+    return math.abs(self.quantity) * sum / self.sides
 end
 
---# Exports
+function DiceRoll:roll()
+    local sum = 0
 
---## Computing the statistics of a roll
+    for n = 1, math.abs(self.quantity) do
+        sum = sum + math.random(1, self.sides)
+    end
 
---### Dice.average
-
-function Dice:average()
-    return map_sum_dice(self, function (quantity, size)
-        return quantity * ((1 + size) / 2)
-    end)
-end
-
-Dice.average = dice_method(Dice.average)
-Dice.ev = Dice.average
-Dice.expected_value = Dice.average
-Dice.mean = Dice.average
-
---### Dice.maximum
-
-function Dice:maximum()
-    return map_sum_dice(self, function (quantity, size)
-        return math.max(quantity * 1, quantity * size)
-    end)
-end
-
-Dice.maximum = dice_method(Dice.maximum)
-Dice.max = Dice.maximum
-
---### Dice.minimum
-
-function Dice:minimum()
-    return map_sum_dice(self, function (quantity, size)
-        return math.min(quantity * 1, quantity * size)
-    end)
-end
-
-Dice.minimum = dice_method(Dice.minimum)
-Dice.min = Dice.minimum
-
---### Dice.range
-
-function Dice:range()
-    return math.abs(self:maximum() - self:minimum() + 1)
-end
-
-Dice.range = dice_method(Dice.range)
-
---### Dice.variance
-
-function Dice:variance()
-    return map_sum_dice(self, function (quantity, size)
-        local single_die_average = (1 + size) / 2
-        local sum = 0
-
-        for n = 1, size do
-            sum = sum + (n - single_die_average) ^ 2 / size
-        end
-
-        return math.abs(quantity) * sum
-    end)
-end
-
-Dice.variance = dice_method(Dice.variance)
-
---### Dice.roll
-
-function Dice:roll()
-    return map_sum_dice(self, function (quantity, size)
-        local sum = 0
-
-        for n = 1, math.abs(quantity) do
-            sum = sum + math.random(1, size)
-        end
-
-        if quantity >= 0 then
-            return sum
-        else
-            return -sum
-        end
-    end)
-end
-
-Dice.roll = dice_method(Dice.roll)
-Dice.sample = Dice.roll
-
---### Dice.compare
-
-function Dice.compare(dice_a, dice_b)
-    local average_a, average_b = Dice.average(dice_a), Dice.average(dice_b)
-
-    if average_a > average_b then
-        return 1, 'greater average'
-    elseif average_b > average_a then
-        return -1, 'greater average'
+    if self.quantity >= 0 then
+        return sum
     else
-        local range_a, range_b = Dice.range(dice_a), Dice.range(dice_b)
-
-        if range_a < range_b then
-            return 1, 'smaller range'
-        elseif range_b < range_a then
-            return -1, 'smaller range'
-        else
-            local variance_a, variance_b =
-                Dice.variance(dice_a), Dice.variance(dice_b)
-
-            if variance_a < variance_b then
-                return 1, 'less variance'
-            elseif variance_b < variance_a then
-                return -1, 'less variance'
-            else
-                return 0, 'no difference'
-            end
-
-            return 0, 'inconclusive'
-        end
+        return -sum
     end
 end
 
---## Parsing a roll from a string
+-- ## Addition
 
---### Dice.from_dice_string
+local Addition = derive(BaseExpression)
 
-function Dice.from_dice_string(dice_string)
-    local dice_list = {}
-
-    for term in dice_string:gsub('%s', ''):gmatch(DICE_TERM_PATTERN) do
-        local quantity, size = term:match(XDY_PATTERN)
-
-        if quantity ~= nil and size ~= nil then
-            table.insert(dice_list, {
-                quantity = tonumber(quantity, 10),
-                size = tonumber(size, 10),
-            })
-        else
-            local quantity = term:match(CONSTANT_PATTERN)
-
-            if quantity ~= nil then
-                table.insert(dice_list, {
-                    quantity = tonumber(quantity, 10),
-                    size = 1,
-                })
-            else
-                error(DICE_STRING_PARSE_ERROR_FORMAT:format(dice_string, term))
-            end
-        end
-    end
-
-    return new_dice(dice_list)
+function Addition:initialize(operand_a, operand_b)
+    assert(is_expression(operand_a))
+    assert(is_expression(operand_b))
+    self.operand_a = operand_a
+    self.operand_b = operand_b
 end
 
-Dice.from_string = Dice.from_dice_string
+function Addition:minimum()
+    return self.operand_a:minimum() + self.operand_b:minimum()
+end
 
---### Dice.from_range_string
+function Addition:maximum()
+    return self.operand_a:maximum() + self.operand_b:maximum()
+end
 
-function Dice.from_range_string(range_string)
-    local minimum, maximum = range_string:gsub('%s', ''):match(RANGE_PATTERN)
+function Addition:variance()
+    return self.operand_a:variance() + self.operand_b:variance()
+end
 
-    if minimum ~= nil and maximum ~= nil then
-        return new_dice{
-            {
-                quantity = 1,
-                size = maximum - minimum + 1,
-            },
-            {
-                quantity = minimum - 1,
-                size = 1,
-            },
-        }
+function Addition:roll()
+    return self.operand_a:roll() + self.operand_b:roll()
+end
+
+-- ## Negation
+
+local Negation = derive(BaseExpression)
+
+function Negation:initialize(operand)
+    assert(is_expression(operand))
+    self.operand = operand
+end
+
+function Negation:minimum()
+    return -self.operand:maximum()
+end
+
+function Negation:maximum()
+    return -self.operand:minimum()
+end
+
+function Negation:variance()
+    return self.operand:variance()
+end
+
+function Negation:roll()
+    return -self.operand:roll()
+end
+
+-- ## Multiplication
+
+local Multiplication = derive(BaseExpression)
+
+function Multiplication:initialize(expression, constant)
+    assert(is_expression(expression))
+    assert(is_natural(constant))
+    self.expression = expression
+    self.constant = constant
+end
+
+function Multiplication:minimum()
+    if self.constant >= 0 then
+        return self.expression:minimum() * self.constant
     else
-        error(RANGE_STRING_PARSE_ERROR_FORMAT:format(range_string, term))
+        return self.expression:maximum() * self.constant
     end
 end
 
---##
+function Multiplication:maximum()
+    if self.constant >= 0 then
+        return self.expression:maximum() * self.constant
+    else
+        return self.expression:minimum() * self.constant
+    end
+end
+
+function Multiplication:variance()
+    return self.expression:variance() * self.constant * self.constant
+end
+
+function Multiplication:roll()
+    return self.expression:roll() * self.constant
+end
+
+-- # Parsing
+
+local Dice = {}
+
+local function try_integer(input)
+    return input ~= nil and tonumber(input:match'^[+-]?%d+$') or nil
+end
+
+local function try_natural(input)
+    return input ~= nil and tonumber(input:match'^%d+$') or nil
+end
+
+function Dice.parse(input)
+    local x, y
+
+    -- addition
+    x, y = input:match'^([^+]+)+(.+)$'
+    if x ~= nil then
+        return Addition:new(Dice.parse(x), Dice.parse(y))
+    end
+
+    -- subtraction
+    x, y = input:match'^([^-]+)-(.+)$'
+    if x ~= nil and input:match'd' then
+        return Addition:new(Dice.parse(x), Negation:new(Dice.parse(y)))
+    end
+
+    -- multiplication
+    x, y = input:match'^([^x]+)x(.+)$'
+    y = try_integer(y)
+    if x ~= nil and y ~= nil then
+        return Multiplication:new(Dice.parse(x), y)
+    end
+
+    -- range
+    x, y = input:match'^([^-]+)-(.+)$'
+    x, y = try_natural(x), try_natural(y)
+    if x ~= nil and y ~= nil then
+        return Addition:new(DiceRoll:new(1, y - x + 1), Constant:new(x - 1))
+    end
+
+    -- dice
+    x, y = input:match'^([^d]+)d(.+)$'
+    x, y = try_integer(x), try_natural(y)
+    if x ~= nil and y ~= nil then
+        return DiceRoll:new(x, y)
+    end
+
+    -- constant
+    x = try_integer(input)
+    if x ~= nil then
+        return Constant:new(x)
+    end
+
+    error(([[
+
+I couldn't understand this as part of an expression:
+%s]]):format(input))
+end
 
 return Dice
