@@ -70,6 +70,43 @@ local function standard_deviation(expression)
     return math.sqrt(expression:variance())
 end
 
+-- Given two dice expressions, signal which is "better", as judged by the
+-- following metrics:
+-- - greater mean
+-- - smaller range
+-- - less variance
+-- The first return value will be 1 if the first argument is better, -1 if the
+-- second is, or 0 if they're indistinguishable. The second return value is a
+-- string describing the metric by which the better one won.
+function compare(dice_a, dice_b)
+    local mean_a, mean_b = dice_a:mean(), dice_b:mean()
+
+    if mean_a > mean_b then
+        return 1, 'greater mean'
+    elseif mean_b > mean_a then
+        return -1, 'greater mean'
+    else
+        local range_a, range_b = dice_a:range(), dice_b:range()
+
+        if range_a < range_b then
+            return 1, 'smaller range'
+        elseif range_b < range_a then
+            return -1, 'smaller range'
+        else
+            local variance_a, variance_b =
+                dice_a:variance(), dice_b:variance()
+
+            if variance_a < variance_b then
+                return 1, 'less variance'
+            elseif variance_b < variance_a then
+                return -1, 'less variance'
+            else
+                return 0, 'no difference'
+            end
+        end
+    end
+end
+
 -- # Dice Expression DSL
 
 -- ## BaseExpression
@@ -79,6 +116,7 @@ local BaseExpression = {
     mean = mean,
     range = range,
     standard_deviation = standard_deviation,
+    compare = compare,
 
     -- Derived classes must provide definitions for these.
     initialize = unimplemented('initialize'),
