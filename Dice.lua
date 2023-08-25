@@ -304,6 +304,7 @@ local function try_natural(input)
 end
 
 function Dice.parse(input)
+    input = input:gsub('%s', '')
     local x, y
 
     -- addition
